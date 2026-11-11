@@ -55,9 +55,9 @@ const int = (v: unknown, min: number, max: number) => {
   return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : min;
 };
 
-async function ghl(env: Env, path: string, body: unknown) {
+async function ghl(env: Env, path: string, body: unknown, method = "POST") {
   const res = await fetch(`${GHL}${path}`, {
-    method: "POST",
+    method,
     headers: {
       Authorization: `Bearer ${env.GHL_API_TOKEN}`,
       Version: "2021-07-28",
@@ -143,7 +143,6 @@ export async function onRequestPost({ request, env }: Ctx): Promise<Response> {
     phone,
     email: email || undefined,
     source: gclid ? "Google Ads - Landing Page" : "Website Landing Page",
-    tags,
     customFields: cf,
   });
   const contactId: string | undefined = c.data?.contact?.id;
@@ -152,17 +151,39 @@ export async function onRequestPost({ request, env }: Ctx): Promise<Response> {
     return json({ ok: false, error: "We couldn't send your request. Please try again or message us on WhatsApp." }, 502);
   }
 
+  // 1b) Re-add the "new-enquiry" tag on EVERY submission, so the GHL workflow trigger
+  //     "Contact Tag added: new-enquiry" fires for repeat customers too (the location
+  //     doesn't allow duplicate opportunities, so "Opportunity created" would not).
+  // Tags are ADDED (never sent in the upsert, which would replace existing tags like "booked").
+  await ghl(env, `/contacts/${contactId}/tags`, { tags: ["new-enquiry"] }, "DELETE");
+  const t = await ghl(env, `/contacts/${contactId}/tags`, { tags: [...tags, "new-enquiry"] });
+  if (!t.ok) console.error("GHL tag failed", t.status, JSON.stringify(t.data).slice(0, 300));
+
   // 2) Opportunity in the pipeline (non-fatal if it already exists)
-  const o = await ghl(env, "/opportunities/", {
+  const oppName = `${name} – ${pkg.name} – ${date}`;
+  let o = await ghl(env, "/opportunities/", {
     locationId: env.GHL_LOCATION_ID,
     pipelineId: env.GHL_PIPELINE_ID,
     pipelineStageId: env.GHL_STAGE_ID,
     contactId,
-    name: `${name} – ${pkg.name} – ${date}`,
+    name: oppName,
     status: "open",
     monetaryValue: value,
     source: gclid ? "Google Ads" : "Website",
   });
+  // Location blocks duplicate opportunities: refresh the existing one if it is still open
+  // (a won/lost opportunity is a past booking and is left untouched; the note records the new request).
+  const existingId: string | undefined = o.data?.meta?.existingId;
+  if (!o.ok && o.data?.code === "OPPORTUNITY_NO_DUPLICATE" && existingId) {
+    const ex = await fetch(`${GHL}/opportunities/${existingId}`, {
+      headers: { Authorization: `Bearer ${env.GHL_API_TOKEN}`, Version: "2021-07-28", Accept: "application/json" },
+    }).then((r) => r.json() as Promise<Record<string, any>>).catch(() => ({} as Record<string, any>));
+    if (ex?.opportunity?.status === "open") {
+      o = await ghl(env, `/opportunities/${existingId}`, {
+        pipelineId: env.GHL_PIPELINE_ID, pipelineStageId: env.GHL_STAGE_ID, name: oppName, monetaryValue: value, status: "open",
+      }, "PUT");
+    }
+  }
   if (!o.ok) console.error("GHL opportunity failed", o.status, JSON.stringify(o.data).slice(0, 500));
 
   // 3) Note with the full request, for the team
