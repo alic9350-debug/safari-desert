@@ -1,7 +1,8 @@
 "use client";
-import { useRef, useState } from "react";
-import { FORM_PACKAGE_OPTIONS, ADDONS } from "@/lib/site";
+import { useMemo, useRef, useState } from "react";
+import { FORM_PACKAGE_OPTIONS, ADDONS, packageById } from "@/lib/site";
 import { pushDL, readAttribution } from "@/lib/tracking";
+import Icon from "@/components/Icon";
 
 const COUNTRY_CODES = [
   ["+971", "🇦🇪 +971"], ["+91", "🇮🇳 +91"], ["+92", "🇵🇰 +92"], ["+44", "🇬🇧 +44"], ["+1", "🇺🇸 +1"],
@@ -11,32 +12,48 @@ const COUNTRY_CODES = [
   ["+61", "🇦🇺 +61"], ["+48", "🇵🇱 +48"], ["+31", "🇳🇱 +31"], ["+90", "🇹🇷 +90"], ["+234", "🇳🇬 +234"],
 ];
 
-function today() {
-  const d = new Date();
-  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+const iso = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+const addDays = (n: number) => { const d = new Date(); d.setDate(d.getDate() + n); return iso(d); };
+
+function Stepper({ label, value, set, min, max, hint }: { label: string; value: number; set: (n: number) => void; min: number; max: number; hint?: string }) {
+  return (
+    <div className="stepper">
+      <span className="stepper-l">{label}{hint && <small>{hint}</small>}</span>
+      <div className="stepper-c">
+        <button type="button" aria-label={`Fewer ${label}`} onClick={() => set(Math.max(min, value - 1))} disabled={value <= min}><Icon name="minus" size={16} /></button>
+        <output aria-live="polite">{value}</output>
+        <button type="button" aria-label={`More ${label}`} onClick={() => set(Math.min(max, value + 1))} disabled={value >= max}><Icon name="plus" size={16} /></button>
+      </div>
+    </div>
+  );
 }
 
-export default function LeadForm({ id = "lead-form" }: { id?: string }) {
+export default function LeadForm({ id = "lead-form", title = "Check availability & price" }: { id?: string; title?: string }) {
   const [step, setStep] = useState<1 | 2>(1);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [pkgId, setPkgId] = useState("");
+  const [date, setDate] = useState("");
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
   const startedAt = useRef<number>(0);
-  const formRef = useRef<HTMLFormElement>(null);
+  const dateRef = useRef<HTMLInputElement>(null);
+  const pkgRef = useRef<HTMLSelectElement>(null);
+
+  const quick = useMemo(() => [{ l: "Today", v: addDays(0) }, { l: "Tomorrow", v: addDays(1) }, { l: "In 2 days", v: addDays(2) }], []);
+  const pkg = packageById(pkgId);
+  const estimate = pkg ? (pkg.unit === "vehicle" ? pkg.price : pkg.price * (adults + children)) : 0;
 
   const markStart = () => {
-    if (!startedAt.current) {
-      startedAt.current = Date.now();
-      pushDL({ event: "form_start", form_id: id });
-    }
+    if (!startedAt.current) { startedAt.current = Date.now(); pushDL({ event: "form_start", form_id: id }); }
   };
 
   const next = () => {
-    const f = formRef.current!;
-    const fields = ["package", "date", "adults"].map((n) => f.elements.namedItem(n) as HTMLInputElement);
-    for (const el of fields) if (!el.reportValidity()) return;
+    if (!pkgRef.current!.reportValidity()) return;
+    if (!date) { setError("Please choose your date."); dateRef.current?.focus(); return; }
     setError("");
     setStep(2);
-    pushDL({ event: "form_step", form_id: id, step: 2 });
+    pushDL({ event: "form_step", form_id: id, step: 2, package: pkgId });
   };
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -47,20 +64,14 @@ export default function LeadForm({ id = "lead-form" }: { id?: string }) {
     const fd = new FormData(f);
     const local = String(fd.get("phone_local") || "").replace(/[^\d]/g, "").replace(/^0+/, "");
     const phone = `${fd.get("cc")}${local}`;
-    if (local.length < 6 || local.length > 13) {
-      setError("Please enter a valid WhatsApp number.");
-      return;
-    }
+    if (local.length < 6 || local.length > 13) { setError("Please enter a valid WhatsApp number."); return; }
     const leadId = crypto.randomUUID();
     const payload = {
       lead_id: leadId,
       name: String(fd.get("name") || "").trim(),
       phone,
       email: String(fd.get("email") || "").trim(),
-      package: String(fd.get("package") || ""),
-      date: String(fd.get("date") || ""),
-      adults: Number(fd.get("adults") || 0),
-      children: Number(fd.get("children") || 0),
+      package: pkgId, date, adults, children,
       pickup: String(fd.get("pickup") || "").trim(),
       addon: String(fd.get("addon") || ""),
       company: String(fd.get("company") || ""), // honeypot
@@ -68,20 +79,12 @@ export default function LeadForm({ id = "lead-form" }: { id?: string }) {
       attribution: readAttribution(),
       page: location.href,
     };
-    setBusy(true);
-    setError("");
+    setBusy(true); setError("");
     try {
-      const res = await fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; value?: number };
       if (!res.ok || !data.ok) throw new Error(data.error || "Something went wrong");
-      sessionStorage.setItem(
-        "msu_lead",
-        JSON.stringify({ lead_id: leadId, name: payload.name, phone, email: payload.email, package: payload.package, date: payload.date, adults: payload.adults, children: payload.children, pickup: payload.pickup, value: data.value || 0 }),
-      );
+      sessionStorage.setItem("msu_lead", JSON.stringify({ lead_id: leadId, name: payload.name, phone, email: payload.email, package: pkgId, date, adults, children, pickup: payload.pickup, value: data.value || estimate }));
       location.href = "/thank-you";
     } catch (err) {
       setBusy(false);
@@ -90,46 +93,66 @@ export default function LeadForm({ id = "lead-form" }: { id?: string }) {
   }
 
   return (
-    <form id={id} ref={formRef} className="lead-form" onSubmit={onSubmit} onFocus={markStart} noValidate={false}>
+    <form id={id} className="lead-form" onSubmit={onSubmit} onFocus={markStart} onClick={markStart}>
       <div className="form-head">
-        <p className="form-title">Check availability & get your price</p>
-        <div className="steps" aria-label={`Step ${step} of 2`}>
-          <span className={step >= 1 ? "on" : ""} /> <span className={step >= 2 ? "on" : ""} />
+        <div>
+          <p className="form-title">{title}</p>
+          <p className="form-sub">Takes 30 seconds · No payment now</p>
         </div>
+        <span className="form-step">Step {step}/2</span>
       </div>
+      <div className="bar"><span style={{ width: step === 1 ? "50%" : "100%" }} /></div>
 
       <fieldset hidden={step !== 1}>
-        <label>
-          Which safari?
-          <select name="package" required defaultValue="">
-            <option value="" disabled>Choose a package</option>
+        <label className="fl">
+          <span>Choose your safari</span>
+          <select ref={pkgRef} name="package" required value={pkgId} onChange={(e) => setPkgId(e.target.value)}>
+            <option value="" disabled>Select a package</option>
             {FORM_PACKAGE_OPTIONS.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
           </select>
         </label>
-        <label>
-          Date
-          <input type="date" name="date" required min={today()} />
-        </label>
-        <div className="row">
-          <label>
-            Adults
-            <input type="number" name="adults" min={1} max={50} defaultValue={2} required inputMode="numeric" />
-          </label>
-          <label>
-            Children (3–11)
-            <input type="number" name="children" min={0} max={30} defaultValue={0} inputMode="numeric" />
-          </label>
+
+        <div className="fl">
+          <span>When?</span>
+          <div className="chips">
+            {quick.map((q) => (
+              <button key={q.l} type="button" className={`chip ${date === q.v ? "on" : ""}`} onClick={() => { setDate(q.v); setError(""); }}>{q.l}</button>
+            ))}
+            <input ref={dateRef} type="date" name="date" aria-label="Pick a date" className={`chip-date ${date && !quick.some((q) => q.v === date) ? "on" : ""}`}
+              min={addDays(0)} value={date} onChange={(e) => { setDate(e.target.value); setError(""); }} />
+          </div>
         </div>
-        <button type="button" className="btn btn-primary btn-block" onClick={next}>Next: Get my price →</button>
+
+        <div className="steppers">
+          <Stepper label="Adults" value={adults} set={setAdults} min={1} max={50} />
+          <Stepper label="Children" hint="3–11 yrs" value={children} set={setChildren} min={0} max={30} />
+        </div>
+
+        <div className={`estimate ${pkg ? "show" : ""}`} aria-live="polite">
+          {pkg ? (
+            <>
+              <span>Estimated total</span>
+              <strong>AED {estimate.toLocaleString()}</strong>
+              <small>{pkg.unit === "vehicle" ? "per private vehicle" : `${adults + children} guest${adults + children > 1 ? "s" : ""} × AED ${pkg.price}`} · final price confirmed on WhatsApp</small>
+            </>
+          ) : (
+            <span>Select a safari to see your estimated price</span>
+          )}
+        </div>
+
+        <button type="button" className="btn btn-primary btn-lg btn-block" onClick={next}>
+          Check availability <Icon name="arrow" />
+        </button>
       </fieldset>
 
       <fieldset hidden={step !== 2}>
-        <label>
-          Your name
-          <input name="name" autoComplete="name" required={step === 2} maxLength={80} placeholder="Full name" />
+        <p className="almost">Almost done! Where should we send your price?</p>
+        <label className="fl">
+          <span>Full name</span>
+          <input name="name" autoComplete="name" required={step === 2} maxLength={80} placeholder="e.g. Sarah Ahmed" />
         </label>
-        <label>
-          WhatsApp number
+        <label className="fl">
+          <span>WhatsApp number</span>
           <div className="phone">
             <select name="cc" defaultValue="+971" aria-label="Country code">
               {COUNTRY_CODES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
@@ -137,33 +160,37 @@ export default function LeadForm({ id = "lead-form" }: { id?: string }) {
             <input name="phone_local" type="tel" autoComplete="tel-national" inputMode="tel" required={step === 2} placeholder="50 123 4567" />
           </div>
         </label>
-        <label>
-          Hotel or pickup area
-          <input name="pickup" maxLength={120} placeholder="e.g. Marina, Deira, Sharjah" />
+        <label className="fl">
+          <span>Hotel or pickup area <em>(optional)</em></span>
+          <input name="pickup" maxLength={120} placeholder="e.g. JBR, Downtown, Deira, Sharjah" />
         </label>
         <div className="row">
-          <label>
-            Email <span className="opt">(optional)</span>
+          <label className="fl">
+            <span>Email <em>(optional)</em></span>
             <input name="email" type="email" autoComplete="email" maxLength={120} placeholder="you@email.com" />
           </label>
-          <label>
-            Add-on
+          <label className="fl">
+            <span>Add-on</span>
             <select name="addon" defaultValue="">
-              <option value="">None</option>
+              <option value="">No add-on</option>
               {ADDONS.map((a) => <option key={a} value={a}>{a}</option>)}
             </select>
           </label>
         </div>
-        {/* Honeypot: hidden from humans */}
         <input name="company" tabIndex={-1} autoComplete="off" className="hp" aria-hidden="true" />
-        <button type="submit" className="btn btn-primary btn-block" disabled={busy}>
-          {busy ? "Sending…" : "Get my price on WhatsApp"}
+        <button type="submit" className="btn btn-primary btn-lg btn-block" disabled={busy}>
+          {busy ? "Sending…" : <>Get my price on WhatsApp <Icon name="arrow" /></>}
         </button>
-        <button type="button" className="link-back" onClick={() => setStep(1)}>← Back</button>
-        <p className="fine">We reply on WhatsApp within minutes. By submitting you agree to be contacted about your booking.</p>
+        <button type="button" className="link-back" onClick={() => setStep(1)}>← Change safari or date</button>
       </fieldset>
 
       {error && <p className="form-error" role="alert">{error}</p>}
+
+      <ul className="form-trust">
+        <li><Icon name="lock" size={14} /> No payment now</li>
+        <li><Icon name="clock" size={14} /> Reply in minutes</li>
+        <li><Icon name="shield" size={14} /> No spam, ever</li>
+      </ul>
     </form>
   );
 }

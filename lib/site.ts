@@ -17,12 +17,14 @@ export type Pkg = {
   time: string;
   tag?: string;
   blurb: string;
+  img: string;
   includes: string[];
 };
 
 export const PACKAGES: Pkg[] = [
   {
     id: "evening-standard",
+    img: "/img/camel.webp",
     name: "Evening Desert Safari",
     price: 75,
     unit: "person",
@@ -33,6 +35,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "vip",
+    img: "/img/show2.webp",
     name: "VIP Desert Safari",
     price: 110,
     unit: "person",
@@ -43,6 +46,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "private",
+    img: "/img/cruiser.webp",
     name: "Private Desert Safari",
     price: 500,
     unit: "vehicle",
@@ -53,6 +57,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "morning",
+    img: "/img/dune.webp",
     name: "Morning Desert Safari",
     price: 160,
     unit: "person",
@@ -62,6 +67,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "overnight",
+    img: "/img/room.webp",
     name: "Overnight Desert Safari",
     price: 185,
     unit: "person",
@@ -71,6 +77,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "self-drive",
+    img: "/img/gate.webp",
     name: "Self-Drive Desert Safari",
     price: 45,
     unit: "person",
@@ -114,3 +121,32 @@ export const FAQ = [
   { q: "Are quad bikes and dune buggies included?", a: "Camel rides, sandboarding and camp entertainment are included. Quad bikes (from AED 150) and dune buggies are optional add-ons." },
   { q: "What should I wear?", a: "Loose, comfortable clothes and sandals or sneakers. From November to March, bring a light jacket — the desert gets cool after sunset." },
 ];
+
+// "Which safari is right for me?" — each card preselects a package in the form.
+export const CHOOSER = [
+  { who: "First time in Dubai", pick: "evening-standard", why: "The full classic: dunes, sunset, camel ride, BBQ and shows." },
+  { who: "Couples & special occasions", pick: "vip", why: "VIP seating and table service, no queues at camp." },
+  { who: "Families, kids & elderly", pick: "private", why: "Your own 4x4 with a gentle soft-drive option." },
+  { who: "Adrenaline lovers", pick: "morning", why: "Extreme dune bashing on the high dunes. Add a quad bike or buggy." },
+  { who: "Sleep under the stars", pick: "overnight", why: "Evening safari plus a desert tent and sunrise breakfast." },
+  { who: "Lowest budget", pick: "self-drive", why: "Drive yourself and enjoy the full evening program." },
+];
+
+export const JOURNEY = [
+  { t: "Pickup from your hotel or meeting point", d: "We confirm the exact time on WhatsApp. Dubai, Sharjah & Ajman.", img: "/img/cruiser.webp" },
+  { t: "4x4 dune bashing on the red dunes", d: "Veteran DTCM-certified drivers. Soft-drive available on private tours.", img: "/img/dune.webp" },
+  { t: "Sandboarding & golden-hour photos", d: "The best sunset spot in the Lahbab desert.", img: "/img/sunset-jump.webp" },
+  { t: "Camel ride, henna & Arabic coffee", d: "Welcome to camp with traditional hospitality.", img: "/img/camel.webp" },
+  { t: "BBQ buffet & live shows", d: "100% halal grill, veg options, Tanoura, belly dance & fire show.", img: "/img/show.webp" },
+  { t: "Safe drop-off back to your hotel", d: "Relax on the drive home with memories (and photos) for life.", img: "/img/family.webp" },
+];
+
+export const COMPARE = [
+  ["Who runs your trip", "Maverick, the direct operator", "Unknown resellers & agents"],
+  ["Camp size", "Boutique camp, short lines", "1,000-person mega-camps"],
+  ["Water, henna, seating", "Included", "Often charged extra"],
+  ["Drivers", "DTCM-certified, insured 4x4s", "Varies"],
+  ["Confirmation", "Real person on WhatsApp in minutes", "Automated emails"],
+];
+
+export const GUEST_PHOTOS = ["family", "sunset-jump", "group", "leap", "sit", "g1", "g2", "g3", "sand", "g6"];

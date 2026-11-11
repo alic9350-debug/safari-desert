@@ -1,7 +1,7 @@
 "use client";
 import { pushDL } from "@/lib/tracking";
 
-/** Button that preselects a package in the form and scrolls to it. */
+/** Preselects a package in the main form and scrolls to it. */
 export default function PickPackage({ id, children, className = "btn btn-primary" }: { id: string; children: React.ReactNode; className?: string }) {
   return (
     <button
@@ -9,10 +9,14 @@ export default function PickPackage({ id, children, className = "btn btn-primary
       className={className}
       onClick={() => {
         const sel = document.querySelector<HTMLSelectElement>("#lead-form select[name=package]");
-        if (sel && id) sel.value = id;
-        pushDL({ event: "select_package", package: id });
-        document.getElementById("book")?.scrollIntoView({ behavior: "smooth", block: "start" });
-        setTimeout(() => document.querySelector<HTMLInputElement>("#lead-form input[name=date]")?.focus({ preventScroll: true }), 500);
+        if (sel && id) {
+          // React-controlled select: use the native setter so onChange fires
+          const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")?.set;
+          setter?.call(sel, id);
+          sel.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+        pushDL({ event: "select_package", package: id || "none" });
+        document.getElementById("lead-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }}
     >
       {children}

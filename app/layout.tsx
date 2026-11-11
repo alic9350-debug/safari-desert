@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Tracking from "@/components/Tracking";
 import { SITE } from "@/lib/site";
+import "@fontsource-variable/plus-jakarta-sans";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   icons: { icon: "/favicon.webp" },
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#1d1712" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0f0d0b" };
 
 // EEA/UK/CH visitors default to denied (Consent Mode v2); everyone else granted.
 const EEA = ["AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT","LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE","IS","LI","NO","GB","CH"];
