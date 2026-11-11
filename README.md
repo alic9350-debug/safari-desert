@@ -36,6 +36,12 @@ View/Edit Contacts and View/Edit Opportunities. A new or changed secret takes ef
 4. **Custom domains → Set up a domain** → `book.mavericksafariuae.com`.
 5. Hostinger hPanel → Domains → DNS → add **CNAME** `book` → `safari-desert.pages.dev`.
 
+## Google Ads conversion (built into the page)
+The thank-you page fires the Google Ads conversion directly with gtag:
+`AW-787388788/zYBICJyuyLYdEPSyuvcC` (action "Safari LP – Lead Form"), value + AED currency,
+`transaction_id` = lead_id, and enhanced-conversion `user_data` (email, phone).
+**Do not** add another Google Ads conversion tag for this action in GTM. Preview builds load no tracking.
+
 ## GTM setup (container GTM-TWKWS8T5)
 Events pushed to the dataLayer:
 | Event | When | Use |

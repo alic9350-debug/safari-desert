@@ -11,7 +11,7 @@ const COOKIE = "msu_attr";
 const MAX_AGE = 60 * 60 * 24 * 90; // 90 days = Google Ads click-ID lookback
 
 declare global {
-  interface Window { dataLayer: Record<string, unknown>[] }
+  interface Window { dataLayer: Record<string, unknown>[]; gtag?: (...args: unknown[]) => void }
 }
 
 export function pushDL(obj: Record<string, unknown>) {

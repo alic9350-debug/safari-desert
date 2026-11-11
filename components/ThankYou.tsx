@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { SITE, packageById } from "@/lib/site";
 import { pushDL, waLink } from "@/lib/tracking";
-import { asset } from "@/lib/asset";
+import { asset, IS_PREVIEW } from "@/lib/asset";
 
 type Lead = { lead_id: string; name: string; phone: string; email?: string; package: string; date: string; adults: number; children: number; pickup?: string; value?: number };
 
@@ -13,11 +13,25 @@ export default function ThankYou() {
     let l: Lead | null = null;
     try { l = JSON.parse(sessionStorage.getItem("msu_lead") || "null"); } catch {}
     setLead(l);
-    if (!l) return;
+    if (!l || IS_PREVIEW) return;
     // Fire the conversion once per lead (refreshes won't double count).
     const firedKey = `msu_fired_${l.lead_id}`;
     if (sessionStorage.getItem(firedKey)) return;
     sessionStorage.setItem(firedKey, "1");
+    // Google Ads conversion (direct gtag, deduped by transaction_id) + enhanced conversions
+    if (!window.gtag) {
+      window.dataLayer = window.dataLayer || [];
+      // gtag must push the real `arguments` object, not an array
+      window.gtag = function () { window.dataLayer.push(arguments as unknown as Record<string, unknown>); };
+    }
+    const gtag = window.gtag;
+    gtag("set", "user_data", { email: l.email || undefined, phone_number: l.phone });
+    gtag("event", "conversion", {
+      send_to: `${SITE.adsId}/${SITE.adsLeadLabel}`,
+      value: l.value || 75,
+      currency: SITE.currency,
+      transaction_id: l.lead_id,
+    });
     pushDL({
       event: "generate_lead",
       lead_id: l.lead_id,          // use as Google Ads "Transaction ID" (dedupe)

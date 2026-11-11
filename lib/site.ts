@@ -9,6 +9,9 @@ export const SITE = {
   whatsappDisplay: "+971 55 252 5075",
   gtmId: process.env.NEXT_PUBLIC_GTM_ID || "GTM-TWKWS8T5",
   currency: "AED",
+  // Google Ads: conversion action "Safari LP – Lead Form" (fired on the thank-you page)
+  adsId: "AW-787388788",
+  adsLeadLabel: "zYBICJyuyLYdEPSyuvcC",
 };
 
 export type Pkg = {

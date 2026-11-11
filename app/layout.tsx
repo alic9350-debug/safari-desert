@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Tracking from "@/components/Tracking";
 import { SITE } from "@/lib/site";
-import { asset } from "@/lib/asset";
+import { asset, IS_PREVIEW } from "@/lib/asset";
 import "@fontsource-variable/plus-jakarta-sans";
 import "./globals.css";
 
@@ -21,18 +21,23 @@ const consentAndGtm = `
 window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
 gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:${JSON.stringify(EEA)},wait_for_update:500});
 gtag('consent','default',{ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted',analytics_storage:'granted'});
+gtag('js',new Date());gtag('config','${SITE.adsId}',{allow_enhanced_conversions:true});
 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${SITE.gtmId}');`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: consentAndGtm }} />
+        {/* Preview builds (GitHub Pages) load no tracking, so test submissions never reach Google Ads/GA4 */}
+        {!IS_PREVIEW && <script dangerouslySetInnerHTML={{ __html: consentAndGtm }} />}
+        {!IS_PREVIEW && <script async src={`https://www.googletagmanager.com/gtag/js?id=${SITE.adsId}`} />}
       </head>
       <body>
+        {!IS_PREVIEW && (
         <noscript>
           <iframe src={`https://www.googletagmanager.com/ns.html?id=${SITE.gtmId}`} height="0" width="0" style={{ display: "none", visibility: "hidden" }} />
         </noscript>
+        )}
         <Tracking />
         {children}
       </body>
