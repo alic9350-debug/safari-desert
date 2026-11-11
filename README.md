@@ -44,3 +44,19 @@ Events pushed to the dataLayer:
 GHL stores the click ID in the custom field `google_click_id` (plus `gbraid`/`wbraid`).
 When an opportunity moves to **Hot Lead** / **New Booking** / **Sale**, a GHL workflow sends
 the click ID, conversion name, time and value to Google Ads (via a Google Sheet scheduled upload, or the Google Ads API).
+
+## Google Ads final URLs (message match)
+Add `?pkg=<id>` to an ad group's final URL: the headline changes to match and the package is preselected.
+
+| Ad group | Final URL |
+|---|---|
+| Generic "desert safari dubai" | `https://book.mavericksafariuae.com/` |
+| Evening safari | `https://book.mavericksafariuae.com/?pkg=evening-standard` |
+| VIP safari | `https://book.mavericksafariuae.com/?pkg=vip` |
+| Private safari | `https://book.mavericksafariuae.com/?pkg=private` |
+| Morning safari | `https://book.mavericksafariuae.com/?pkg=morning` |
+| Overnight safari | `https://book.mavericksafariuae.com/?pkg=overnight` |
+| Cheap / budget safari | `https://book.mavericksafariuae.com/?pkg=basic-bus` |
+| Self-drive safari | `https://book.mavericksafariuae.com/?pkg=self-drive` |
+
+Turn on auto-tagging in Google Ads so every click carries a `gclid`.

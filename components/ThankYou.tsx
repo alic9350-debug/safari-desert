@@ -38,9 +38,9 @@ export default function ThankYou() {
     : "Hi Maverick Safari! I'd like to book a desert safari.";
 
   return (
-    <main className="ty" style={{ backgroundImage: `linear-gradient(180deg, rgba(15,13,11,.55), rgba(15,13,11,.85)), url(${asset("/img/hero.jpg")})` }}>
+    <main className="ty" style={{ backgroundImage: `linear-gradient(180deg, rgba(15,13,11,.55), rgba(15,13,11,.85)), url(${asset("/img/hero-1600.webp")})` }}>
       <div className="ty-card">
-        <img src={asset("/img/logo.png")} alt={SITE.brand} width={200} height={57} className="ty-logo" />
+        <img src={asset("/img/logo-320.webp")} alt={SITE.brand} width={200} height={57} className="ty-logo" />
         <div className="ty-check" aria-hidden="true">✓</div>
         <h1>{first ? `Thanks ${first}, we've got your request!` : "Thanks, we've got your request!"}</h1>
         <p className="lead-p">Our team is checking availability now and will send your <strong>price and pickup time on WhatsApp</strong> shortly.</p>

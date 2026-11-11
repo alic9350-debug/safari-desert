@@ -2,15 +2,14 @@ import LeadForm from "@/components/LeadForm";
 import PickPackage from "@/components/PickPackage";
 import Icon from "@/components/Icon";
 import StickyBar from "@/components/StickyBar";
+import HeroHeadline from "@/components/HeroHeadline";
 import { CHOOSER, COMPARE, FAQ, GUEST_PHOTOS, JOURNEY, PACKAGES, REVIEWS, SITE, WHY, packageById } from "@/lib/site";
 import { waLink } from "@/lib/tracking";
 import { asset, IS_PREVIEW } from "@/lib/asset";
 
-const HERO_SHADE = "linear-gradient(90deg, rgba(15,13,11,.88) 0%, rgba(15,13,11,.6) 45%, rgba(15,13,11,.25) 100%), linear-gradient(0deg, rgba(15,13,11,.55) 0%, rgba(15,13,11,0) 40%)";
-
 const WA_TEXT = "Hi Maverick Safari! I'd like the price for a desert safari.";
 const Stars = () => (
-  <span className="stars" aria-label="5 out of 5 stars">
+  <span className="stars" role="img" aria-label="5 out of 5 stars">
     {[0, 1, 2, 3, 4].map((i) => <Icon key={i} name="star" size={16} />)}
   </span>
 );
@@ -25,7 +24,7 @@ export default function Home() {
 
       <header className="nav">
         <div className="wrap nav-in">
-          <a href="#top" aria-label={SITE.brand}><img src={asset("/img/logo.png")} alt={SITE.brand} width={150} height={43} className="logo" /></a>
+          <a href="#top" aria-label={SITE.brand}><img src={asset("/img/logo-320.webp")} alt={SITE.brand} width={150} height={43} className="logo" /></a>
           <nav className="nav-links" aria-label="Sections">
             <a href="#packages">Packages</a>
             <a href="#experience">Experience</a>
@@ -44,14 +43,13 @@ export default function Home() {
       <main id="top">
         {/* 1. HERO — promise + form above the fold */}
         <section className="hero" id="book">
-          <div className="hero-bg" aria-hidden="true" style={{ backgroundImage: `${HERO_SHADE}, url(${asset("/img/hero.jpg")})` }} />
+          <div className="hero-bg" aria-hidden="true">
+            <img src={asset("/img/hero-1600.webp")} srcSet={`${asset("/img/hero-828.webp")} 828w, ${asset("/img/hero-1600.webp")} 1600w`} sizes="100vw" alt="" fetchPriority="high" width={1600} height={915} />
+          </div>
           <div className="wrap hero-in">
             <div className="hero-copy">
               <div className="rating-chip"><Stars /> <span>Loved by guests on Google</span></div>
-              <h1>Watch the sun set over Dubai&apos;s <span className="grad">red dunes</span></h1>
-              <p className="sub">
-                Dune bashing, camel ride, BBQ dinner &amp; live shows, booked <strong>direct with the operator</strong>. No middlemen, no hidden fees. From <strong>AED&nbsp;75</strong>.
-              </p>
+              <HeroHeadline />
               <ul className="hero-points">
                 <li><Icon name="check" /> Pickup from Dubai, Sharjah &amp; Ajman</li>
                 <li><Icon name="check" /> Boutique camp, no 1,000-person crowds</li>
@@ -59,7 +57,7 @@ export default function Home() {
               </ul>
               <div className="hero-proof">
                 <div className="avatars" aria-hidden="true">
-                  {["family", "sunset-jump", "group", "sit"].map((g) => <img key={g} src={asset(`/img/${g}.webp`)} alt="" width={40} height={40} />)}
+                  {["family", "sunset-jump", "group", "sit"].map((g) => <img key={g} src={asset(`/img/av-${g}.webp`)} alt="" width={40} height={40} loading="lazy" />)}
                 </div>
                 <span>Travelers from <strong>around the world</strong> book direct with Maverick</span>
               </div>
@@ -228,7 +226,7 @@ export default function Home() {
 
         {/* 9. FINAL CTA with second form */}
         <section className="final">
-          <div className="final-bg" aria-hidden="true" style={{ backgroundImage: `linear-gradient(90deg, rgba(15,13,11,.92), rgba(15,13,11,.7)), url(${asset("/img/hero.jpg")})` }} />
+          <div className="final-bg" aria-hidden="true" style={{ backgroundImage: `linear-gradient(90deg, rgba(15,13,11,.92), rgba(15,13,11,.7)), url(${asset("/img/hero-1600.webp")})` }} />
           <div className="wrap final-in">
             <div>
               <h2>Your sunset in the dunes starts here</h2>
@@ -246,10 +244,10 @@ export default function Home() {
 
       <footer className="foot">
         <div className="wrap foot-in">
-          <img src={asset("/img/logo.png")} alt={SITE.brand} width={140} height={40} className="foot-logo" />
+          <img src={asset("/img/logo-320.webp")} alt={SITE.brand} width={140} height={40} className="foot-logo" loading="lazy" />
           <div>
             <p><strong>{SITE.brand}</strong> · Desert safaris &amp; UAE tours · Dubai, United Arab Emirates</p>
-            <p><Icon name="chat" size={14} /> WhatsApp: <a data-loc="footer" href={waLink(WA_TEXT, SITE.whatsapp)} target="_blank" rel="noopener">{SITE.whatsappDisplay}</a> · <a href={`${SITE.mainSite}/contact/`}>Contact</a> · <a href={`${SITE.mainSite}/privacy-policy/`}>Privacy policy</a> · <a href={SITE.mainSite}>Main website</a></p>
+            <p><Icon name="chat" size={14} /> WhatsApp: <a data-loc="footer" href={waLink(WA_TEXT, SITE.whatsapp)} target="_blank" rel="noopener">{SITE.whatsappDisplay}</a> · <a data-loc="footer" href={`tel:+${SITE.whatsapp}`}>Call us</a> · <a href={`${SITE.mainSite}/contact/`}>Contact</a> · <a href={`${SITE.mainSite}/privacy-policy/`}>Privacy policy</a> · <a href={SITE.mainSite}>Main website</a></p>
             <p className="copy">© {new Date().getFullYear()} {SITE.brand}. All rights reserved.</p>
           </div>
         </div>

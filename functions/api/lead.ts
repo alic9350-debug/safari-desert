@@ -41,6 +41,7 @@ const PACKAGES: Record<string, { name: string; price: number; unit: "person" | "
   private: { name: "Private Desert Safari", price: 500, unit: "vehicle" },
   morning: { name: "Morning Desert Safari", price: 160, unit: "person" },
   overnight: { name: "Overnight Desert Safari", price: 185, unit: "person" },
+  "basic-bus": { name: "Basic Bus Desert Safari", price: 55, unit: "person" },
   "self-drive": { name: "Self-Drive Desert Safari", price: 45, unit: "person" },
   "help-me-choose": { name: "Help me choose", price: 0, unit: "person" },
 };

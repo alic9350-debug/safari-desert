@@ -32,8 +32,8 @@ export const PACKAGES: Pkg[] = [
     unit: "person",
     time: "6–7 hrs · Evening",
     tag: "Most popular",
-    blurb: "The classic: red dunes at sunset, camel ride, BBQ dinner and live shows.",
-    includes: ["Pickup & drop-off", "Dune bashing & sandboarding", "Camel ride & henna", "BBQ buffet & live shows"],
+    blurb: "The classic: 30–40 min of red-dune bashing at sunset, camel ride, BBQ dinner and live shows.",
+    includes: ["4x4 pickup & drop-off from your location", "Lahbab red dune bashing & sandboarding", "Camel ride, henna & Arabic coffee", "Halal BBQ buffet & live shows"],
   },
   {
     id: "vip",
@@ -54,7 +54,7 @@ export const PACKAGES: Pkg[] = [
     unit: "vehicle",
     time: "6–7 hrs · Private 4x4",
     tag: "Families & couples",
-    blurb: "Your own Land Cruiser, flexible pickup, soft-drive option on request.",
+    blurb: "Your own Land Cruiser for up to 6 guests, flexible pickup, soft-drive option on request.",
     includes: ["Private 4x4 pickup & drop-off", "Dune bashing or soft-drive", "Camel ride & sunset photos", "BBQ dinner & live shows"],
   },
   {
@@ -64,8 +64,8 @@ export const PACKAGES: Pkg[] = [
     price: 160,
     unit: "person",
     time: "4 hrs · Morning",
-    blurb: "Pure adrenaline on the high dunes before the midday heat.",
-    includes: ["Morning 4x4 pickup & drop-off", "Extreme dune bashing", "Sandboarding on high dunes"],
+    blurb: "40–45 min of extreme dune bashing, back at your hotel by lunchtime. No evening camp.",
+    includes: ["Morning 4x4 pickup & drop-off", "Extreme Lahbab dune bashing", "Sandboarding & camel ride", "Bottled water included"],
   },
   {
     id: "overnight",
@@ -75,7 +75,18 @@ export const PACKAGES: Pkg[] = [
     unit: "person",
     time: "Overnight",
     blurb: "The full evening safari, then sleep under the stars and wake to a desert sunrise.",
-    includes: ["Evening 4x4 pickup & drop-off", "Dune bashing & camel ride", "Desert tent & breakfast"],
+    includes: ["4x4 pickup & next-day drop-off", "Dune bashing, camel ride & BBQ dinner", "Tent, bedding & pillows provided", "Breakfast at sunrise"],
+  },
+  {
+    id: "basic-bus",
+    img: asset("/img/group.webp"),
+    name: "Basic Bus Desert Safari",
+    price: 55,
+    unit: "person",
+    time: "Evening · Shared bus",
+    tag: "Budget pick",
+    blurb: "The full evening program with bus pickup from central meeting points.",
+    includes: ["Bus pickup from central points", "Dune bashing & sandboarding", "Camel ride & henna", "BBQ buffet & live shows"],
   },
   {
     id: "self-drive",
@@ -93,7 +104,7 @@ export const PACKAGES: Pkg[] = [
 export const ADDONS = ["Quad bike", "Dune buggy", "Not sure yet"];
 
 export const FORM_PACKAGE_OPTIONS = [
-  ...PACKAGES.map((p) => ({ id: p.id, label: `${p.name} — from AED ${p.price}` })),
+  ...PACKAGES.map((p) => ({ id: p.id, label: `${p.name.replace(" Desert Safari", "")} safari · AED ${p.price}` })),
   { id: "help-me-choose", label: "Not sure — help me choose" },
 ];
 
@@ -131,7 +142,7 @@ export const CHOOSER = [
   { who: "Families, kids & elderly", pick: "private", why: "Your own 4x4 with a gentle soft-drive option." },
   { who: "Adrenaline lovers", pick: "morning", why: "Extreme dune bashing on the high dunes. Add a quad bike or buggy." },
   { who: "Sleep under the stars", pick: "overnight", why: "Evening safari plus a desert tent and sunrise breakfast." },
-  { who: "Lowest budget", pick: "self-drive", why: "Drive yourself and enjoy the full evening program." },
+  { who: "Budget with pickup", pick: "basic-bus", why: "Shared bus from central meeting points, full evening program." },
 ];
 
 export const JOURNEY = [
@@ -152,3 +163,15 @@ export const COMPARE = [
 ];
 
 export const GUEST_PHOTOS = ["family", "sunset-jump", "group", "leap", "sit", "g1", "g2", "g3", "sand", "g6"];
+
+// Ad-group message match: /?pkg=<id> swaps the headline and preselects the package.
+export const HEADLINES: Record<string, { pre: string; hl: string; post?: string }> = {
+  default: { pre: "Dubai Desert Safari: sunset over the ", hl: "red dunes" },
+  "evening-standard": { pre: "Evening Desert Safari Dubai with ", hl: "BBQ & live shows" },
+  vip: { pre: "VIP Desert Safari Dubai with ", hl: "table service" },
+  private: { pre: "Private Desert Safari Dubai in ", hl: "your own Land Cruiser" },
+  morning: { pre: "Morning Desert Safari Dubai: ", hl: "extreme dune bashing" },
+  overnight: { pre: "Overnight Desert Safari Dubai ", hl: "under the stars" },
+  "basic-bus": { pre: "Budget Desert Safari Dubai from ", hl: "AED 55" },
+  "self-drive": { pre: "Self-Drive Desert Safari Dubai from ", hl: "AED 45" },
+};
