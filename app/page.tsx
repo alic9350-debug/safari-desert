@@ -175,7 +175,7 @@ export default function Home() {
             </div>
             <div className="camp-mosaic" aria-label="Our camp">
               <img src={asset("/img/gate.webp")} alt="Camp entrance" loading="lazy" width={360} height={480} />
-              <img src={asset("/img/vip.webp")} alt="VIP seating" loading="lazy" width={360} height={480} />
+              <img src={asset("/img/show2.webp")} alt="Live show at camp" loading="lazy" width={360} height={480} />
               <img src={asset("/img/buffet.webp")} alt="BBQ buffet" loading="lazy" width={360} height={480} />
               <img src={asset("/img/lounge.webp")} alt="Camp lounge" loading="lazy" width={360} height={480} />
             </div>
@@ -228,7 +228,7 @@ export default function Home() {
 
         {/* 9. FINAL CTA with second form */}
         <section className="final">
-          <div className="final-bg" aria-hidden="true" style={{ backgroundImage: `linear-gradient(90deg, rgba(15,13,11,.92), rgba(15,13,11,.7)), url(${asset("/img/dune.webp")})` }} />
+          <div className="final-bg" aria-hidden="true" style={{ backgroundImage: `linear-gradient(90deg, rgba(15,13,11,.92), rgba(15,13,11,.7)), url(${asset("/img/hero.jpg")})` }} />
           <div className="wrap final-in">
             <div>
               <h2>Your sunset in the dunes starts here</h2>

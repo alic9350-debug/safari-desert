@@ -37,7 +37,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "vip",
-    img: asset("/img/show2.webp"),
+    img: asset("/img/vip.webp"),
     name: "VIP Desert Safari",
     price: 110,
     unit: "person",
@@ -59,7 +59,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "morning",
-    img: asset("/img/dune.webp"),
+    img: asset("/img/g4.webp"),
     name: "Morning Desert Safari",
     price: 160,
     unit: "person",
@@ -69,7 +69,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "overnight",
-    img: asset("/img/room.webp"),
+    img: asset("/img/sunrise.webp"),
     name: "Overnight Desert Safari",
     price: 185,
     unit: "person",
@@ -137,10 +137,10 @@ export const CHOOSER = [
 export const JOURNEY = [
   { t: "Pickup from your hotel or meeting point", d: "We confirm the exact time on WhatsApp. Dubai, Sharjah & Ajman.", img: asset("/img/cruiser.webp") },
   { t: "4x4 dune bashing on the red dunes", d: "Veteran DTCM-certified drivers. Soft-drive available on private tours.", img: asset("/img/dune.webp") },
-  { t: "Sandboarding & golden-hour photos", d: "The best sunset spot in the Lahbab desert.", img: asset("/img/sunset-jump.webp") },
+  { t: "Sandboarding & golden-hour photos", d: "The best sunset spot in the Lahbab desert.", img: asset("/img/g1.webp") },
   { t: "Camel ride, henna & Arabic coffee", d: "Welcome to camp with traditional hospitality.", img: asset("/img/camel.webp") },
   { t: "BBQ buffet & live shows", d: "100% halal grill, veg options, Tanoura, belly dance & fire show.", img: asset("/img/show.webp") },
-  { t: "Safe drop-off back to your hotel", d: "Relax on the drive home with memories (and photos) for life.", img: asset("/img/family.webp") },
+  { t: "Safe drop-off, memories for life", d: "Relax on the drive back to your hotel with photos you'll treasure.", img: asset("/img/family.webp") },
 ];
 
 export const COMPARE = [

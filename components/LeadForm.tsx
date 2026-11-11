@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FORM_PACKAGE_OPTIONS, ADDONS, packageById } from "@/lib/site";
 import { pushDL, readAttribution } from "@/lib/tracking";
 import Icon from "@/components/Icon";
@@ -15,6 +15,7 @@ const COUNTRY_CODES = [
 
 const iso = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 const addDays = (n: number) => { const d = new Date(); d.setDate(d.getDate() + n); return iso(d); };
+const dayLabel = (n: number) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric" }); };
 
 function Stepper({ label, value, set, min, max, hint }: { label: string; value: number; set: (n: number) => void; min: number; max: number; hint?: string }) {
   return (
@@ -41,7 +42,13 @@ export default function LeadForm({ id = "lead-form", title = "Check availability
   const dateRef = useRef<HTMLInputElement>(null);
   const pkgRef = useRef<HTMLSelectElement>(null);
 
-  const quick = useMemo(() => [{ l: "Today", v: addDays(0) }, { l: "Tomorrow", v: addDays(1) }, { l: "In 2 days", v: addDays(2) }], []);
+  // Dates are computed in the browser (the HTML is pre-built, so build-time dates would be stale).
+  const [quick, setQuick] = useState([{ l: "Today", v: "" }, { l: "Tomorrow", v: "" }, { l: "+2 days", v: "" }]);
+  const [minDate, setMinDate] = useState("");
+  useEffect(() => {
+    setQuick([{ l: "Today", v: addDays(0) }, { l: "Tomorrow", v: addDays(1) }, { l: dayLabel(2), v: addDays(2) }]);
+    setMinDate(addDays(0));
+  }, []);
   const pkg = packageById(pkgId);
   const estimate = pkg ? (pkg.unit === "vehicle" ? pkg.price : pkg.price * (adults + children)) : 0;
 
@@ -120,10 +127,10 @@ export default function LeadForm({ id = "lead-form", title = "Check availability
           <span>When?</span>
           <div className="chips">
             {quick.map((q) => (
-              <button key={q.l} type="button" className={`chip ${date === q.v ? "on" : ""}`} onClick={() => { setDate(q.v); setError(""); }}>{q.l}</button>
+              <button key={q.l} type="button" className={`chip ${q.v && date === q.v ? "on" : ""}`} onClick={() => { if (q.v) { setDate(q.v); setError(""); } }}>{q.l}</button>
             ))}
             <input ref={dateRef} type="date" name="date" aria-label="Pick a date" className={`chip-date ${date && !quick.some((q) => q.v === date) ? "on" : ""}`}
-              min={addDays(0)} value={date} onChange={(e) => { setDate(e.target.value); setError(""); }} />
+              min={minDate || undefined} value={date} onChange={(e) => { setDate(e.target.value); setError(""); }} />
           </div>
         </div>
 
