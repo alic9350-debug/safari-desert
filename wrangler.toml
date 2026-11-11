@@ -1,0 +1,13 @@
+# Cloudflare Pages config. Non-secret settings live here (version-controlled).
+# The only secret, GHL_API_TOKEN, is added in the Cloudflare dashboard:
+# Pages project -> Settings -> Variables and Secrets -> Add -> Type: Secret.
+name = "safari-desert"
+pages_build_output_dir = "out"
+compatibility_date = "2025-09-01"
+
+[vars]
+GHL_LOCATION_ID = "cp6Z02inGKSRvMMNdWrO"
+# "Marketing Pipeline" -> "New Lead" stage
+GHL_PIPELINE_ID = "iSP6QIM2hHkNPfFb4tny"
+GHL_STAGE_ID = "feb389bb-485a-4cd0-a122-631c1320f3c3"
+ALLOWED_ORIGINS = "https://book.mavericksafariuae.com,https://safari-desert.pages.dev"
