@@ -25,6 +25,11 @@ Ad click (gclid/UTMs saved in a 90-day cookie)
 If you change a price in `lib/site.ts`, change it in `functions/api/lead.ts` too (used for the opportunity value).
 
 ## Deploy on Cloudflare Pages (DNS stays at Hostinger)
+Live: https://safari-desert.pages.dev (project `safari-desert`, production branch `claude/keen-brown-xcp8vr`).
+
+`GHL_API_TOKEN` should come from a dedicated GHL Private Integration ("Landing Page Form") with only
+View/Edit Contacts and View/Edit Opportunities. A new or changed secret takes effect on the next deployment.
+
 1. Cloudflare dashboard → **Workers & Pages → Create → Pages → Connect to Git** → pick `safari-desert`.
 2. Build settings: Framework preset **None** · Build command `npm run build` · Output directory `out` · Production branch: `main`.
 3. After the first deploy: **Settings → Variables and Secrets → Add** `GHL_API_TOKEN` (type **Secret**) for Production *and* Preview → **redeploy**.
