@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:preview": "NEXT_PUBLIC_BASE_PATH=/safari-desert NEXT_PUBLIC_PREVIEW=1 next build && touch out/.nojekyll"
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",

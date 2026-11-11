@@ -3,6 +3,7 @@ import { useMemo, useRef, useState } from "react";
 import { FORM_PACKAGE_OPTIONS, ADDONS, packageById } from "@/lib/site";
 import { pushDL, readAttribution } from "@/lib/tracking";
 import Icon from "@/components/Icon";
+import { asset, IS_PREVIEW } from "@/lib/asset";
 
 const COUNTRY_CODES = [
   ["+971", "🇦🇪 +971"], ["+91", "🇮🇳 +91"], ["+92", "🇵🇰 +92"], ["+44", "🇬🇧 +44"], ["+1", "🇺🇸 +1"],
@@ -81,11 +82,14 @@ export default function LeadForm({ id = "lead-form", title = "Check availability
     };
     setBusy(true); setError("");
     try {
-      const res = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; value?: number };
-      if (!res.ok || !data.ok) throw new Error(data.error || "Something went wrong");
+      let data: { ok?: boolean; error?: string; value?: number } = { ok: true, value: estimate };
+      if (!IS_PREVIEW) {
+        const res = await fetch(asset("/api/lead"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        data = (await res.json().catch(() => ({}))) as typeof data;
+        if (!res.ok || !data.ok) throw new Error(data.error || "Something went wrong");
+      }
       sessionStorage.setItem("msu_lead", JSON.stringify({ lead_id: leadId, name: payload.name, phone, email: payload.email, package: pkgId, date, adults, children, pickup: payload.pickup, value: data.value || estimate }));
-      location.href = "/thank-you";
+      location.href = asset("/thank-you");
     } catch (err) {
       setBusy(false);
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again or message us on WhatsApp.");

@@ -4,5 +4,6 @@ const nextConfig = {
   output: "export",
   images: { unoptimized: true },
   poweredByHeader: false,
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
 };
 export default nextConfig;

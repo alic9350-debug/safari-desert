@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { SITE, packageById } from "@/lib/site";
 import { pushDL, waLink } from "@/lib/tracking";
+import { asset } from "@/lib/asset";
 
 type Lead = { lead_id: string; name: string; phone: string; email?: string; package: string; date: string; adults: number; children: number; pickup?: string; value?: number };
 
@@ -37,9 +38,9 @@ export default function ThankYou() {
     : "Hi Maverick Safari! I'd like to book a desert safari.";
 
   return (
-    <main className="ty">
+    <main className="ty" style={{ backgroundImage: `linear-gradient(180deg, rgba(15,13,11,.55), rgba(15,13,11,.85)), url(${asset("/img/hero.jpg")})` }}>
       <div className="ty-card">
-        <img src="/img/logo.png" alt={SITE.brand} width={200} height={57} className="ty-logo" />
+        <img src={asset("/img/logo.png")} alt={SITE.brand} width={200} height={57} className="ty-logo" />
         <div className="ty-check" aria-hidden="true">✓</div>
         <h1>{first ? `Thanks ${first}, we've got your request!` : "Thanks, we've got your request!"}</h1>
         <p className="lead-p">Our team is checking availability now and will send your <strong>price and pickup time on WhatsApp</strong> shortly.</p>

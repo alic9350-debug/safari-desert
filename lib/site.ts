@@ -1,3 +1,5 @@
+import { asset } from "@/lib/asset";
+
 // Central content + settings for the landing page. Edit prices/copy here.
 
 export const SITE = {
@@ -24,7 +26,7 @@ export type Pkg = {
 export const PACKAGES: Pkg[] = [
   {
     id: "evening-standard",
-    img: "/img/camel.webp",
+    img: asset("/img/camel.webp"),
     name: "Evening Desert Safari",
     price: 75,
     unit: "person",
@@ -35,7 +37,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "vip",
-    img: "/img/show2.webp",
+    img: asset("/img/show2.webp"),
     name: "VIP Desert Safari",
     price: 110,
     unit: "person",
@@ -46,7 +48,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "private",
-    img: "/img/cruiser.webp",
+    img: asset("/img/cruiser.webp"),
     name: "Private Desert Safari",
     price: 500,
     unit: "vehicle",
@@ -57,7 +59,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "morning",
-    img: "/img/dune.webp",
+    img: asset("/img/dune.webp"),
     name: "Morning Desert Safari",
     price: 160,
     unit: "person",
@@ -67,7 +69,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "overnight",
-    img: "/img/room.webp",
+    img: asset("/img/room.webp"),
     name: "Overnight Desert Safari",
     price: 185,
     unit: "person",
@@ -77,7 +79,7 @@ export const PACKAGES: Pkg[] = [
   },
   {
     id: "self-drive",
-    img: "/img/gate.webp",
+    img: asset("/img/gate.webp"),
     name: "Self-Drive Desert Safari",
     price: 45,
     unit: "person",
@@ -133,12 +135,12 @@ export const CHOOSER = [
 ];
 
 export const JOURNEY = [
-  { t: "Pickup from your hotel or meeting point", d: "We confirm the exact time on WhatsApp. Dubai, Sharjah & Ajman.", img: "/img/cruiser.webp" },
-  { t: "4x4 dune bashing on the red dunes", d: "Veteran DTCM-certified drivers. Soft-drive available on private tours.", img: "/img/dune.webp" },
-  { t: "Sandboarding & golden-hour photos", d: "The best sunset spot in the Lahbab desert.", img: "/img/sunset-jump.webp" },
-  { t: "Camel ride, henna & Arabic coffee", d: "Welcome to camp with traditional hospitality.", img: "/img/camel.webp" },
-  { t: "BBQ buffet & live shows", d: "100% halal grill, veg options, Tanoura, belly dance & fire show.", img: "/img/show.webp" },
-  { t: "Safe drop-off back to your hotel", d: "Relax on the drive home with memories (and photos) for life.", img: "/img/family.webp" },
+  { t: "Pickup from your hotel or meeting point", d: "We confirm the exact time on WhatsApp. Dubai, Sharjah & Ajman.", img: asset("/img/cruiser.webp") },
+  { t: "4x4 dune bashing on the red dunes", d: "Veteran DTCM-certified drivers. Soft-drive available on private tours.", img: asset("/img/dune.webp") },
+  { t: "Sandboarding & golden-hour photos", d: "The best sunset spot in the Lahbab desert.", img: asset("/img/sunset-jump.webp") },
+  { t: "Camel ride, henna & Arabic coffee", d: "Welcome to camp with traditional hospitality.", img: asset("/img/camel.webp") },
+  { t: "BBQ buffet & live shows", d: "100% halal grill, veg options, Tanoura, belly dance & fire show.", img: asset("/img/show.webp") },
+  { t: "Safe drop-off back to your hotel", d: "Relax on the drive home with memories (and photos) for life.", img: asset("/img/family.webp") },
 ];
 
 export const COMPARE = [

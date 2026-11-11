@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Tracking from "@/components/Tracking";
 import { SITE } from "@/lib/site";
+import { asset } from "@/lib/asset";
 import "@fontsource-variable/plus-jakarta-sans";
 import "./globals.css";
 
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   description: "Book a Dubai desert safari direct with the operator: hotel pickup, 4x4 dune bashing, camel ride, BBQ dinner & live shows. No hidden fees. Fast WhatsApp confirmation.",
   // Ad landing page: keep it out of organic search so it doesn't compete with the main site.
   robots: { index: false, follow: true },
-  icons: { icon: "/favicon.webp" },
+  icons: { icon: asset("/favicon.webp") },
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0f0d0b" };
@@ -27,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <script dangerouslySetInnerHTML={{ __html: consentAndGtm }} />
-        <link rel="preload" as="image" href="/img/hero.jpg" />
+        <link rel="preload" as="image" href={asset("/img/hero.jpg")} />
       </head>
       <body>
         <noscript>
