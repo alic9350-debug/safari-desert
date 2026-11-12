@@ -133,3 +133,34 @@ Google ad click (that is why the `google-ads` tag filter is there).
 `/api/conversions.csv` is an alternative feed for Google Ads scheduled HTTPS uploads. It stays **off** unless the
 Cloudflare secret `CONVERSIONS_PASSWORD` is set. Do not use it together with the workflows above (same conversion
 names would be counted twice).
+
+---
+
+## Google Ads ← GHL via Google Sheet (chosen method)
+Sheet: **Maverick Safari – Google Ads Offline Conversions**
+https://docs.google.com/spreadsheets/d/10IwUrDWdjGcQ2tFIxPbxyyynsXKGt0CnafA2pH3VrJ0/edit
+(owner rafiq…@gmail.com · tab **Conversions** · timezone Asia/Dubai · columns A–G formatted as text; row 1 = headers;
+tab "How it works" explains each column). Do not rename the tab or edit row 1.
+
+### Workflow "Google Ads | Qualified → Sheet"
+- Trigger: Pipeline Stage Changed → *Desert Safari Leads* → **Quoted on WhatsApp**. Allow re-entry **OFF**.
+- Action 1 — **Date/Time Formatter**: input *Current date & time*, timezone **Asia/Dubai**, format **`YYYY-MM-DD HH:mm:ss`**.
+- Action 2 — **Google Sheets → Create Spreadsheet Row** → sheet above → worksheet **Conversions**:
+
+| Column | Value |
+|---|---|
+| Google Click ID | `{{contact.google_click_id}}` |
+| Conversion Name | `Safari – Qualified Lead` |
+| Conversion Time | *(Formatter output)* followed by `+0400` |
+| Conversion Value | *(leave empty)* |
+| Conversion Currency | `AED` |
+| Email | `{{contact.email}}` |
+| Phone Number | `'{{contact.phone}}` (leading apostrophe keeps the `+`) |
+
+### Workflow "Google Ads | Booking → Sheet"
+Same as above with trigger stage **Booking Confirmed**, Conversion Name `Safari – Booking Confirmed`, Conversion Value
+`{{opportunity.monetary_value}}`. Team rule: set the real booking value on the opportunity *before* moving the stage.
+
+### Google Ads side
+Goals → Conversions → Data manager → connect **Google Sheets** (sign in with the sheet owner's Google account) →
+pick the sheet / tab **Conversions** → map columns A–G → schedule **daily**.
