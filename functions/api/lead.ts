@@ -134,8 +134,12 @@ export async function onRequestPost({ request, env }: Ctx): Promise<Response> {
   add(FIELD.adults, adults);
   add(FIELD.children, children);
 
-  // 1) Contact (upsert = no duplicates if they enquire twice)
-  const c = await ghl(env, "/contacts/upsert", {
+  // 1) Contact. New contacts are CREATED with GHL's native attributionSource (gclid/gbraid/wbraid,
+  //    UTMs), which is what GHL's "Add to Google Ads" workflow action and attribution reports read.
+  //    The upsert endpoint ignores attributionSource, so it is only used for existing contacts.
+  const gbraid = str(a.gbraid, 300), wbraid = str(a.wbraid, 300), fbclid = str(a.fbclid, 300);
+  const landing = str(a.landing_page, 500) || str(b.page, 500);
+  const contactBody = {
     locationId: env.GHL_LOCATION_ID,
     firstName,
     lastName: rest.join(" ") || undefined,
@@ -144,10 +148,27 @@ export async function onRequestPost({ request, env }: Ctx): Promise<Response> {
     email: email || undefined,
     source: gclid ? "Google Ads - Landing Page" : "Website Landing Page",
     customFields: cf,
-  });
-  const contactId: string | undefined = c.data?.contact?.id;
-  if (!c.ok || !contactId) {
-    console.error("GHL upsert failed", c.status, JSON.stringify(c.data).slice(0, 500));
+  };
+  const attributionSource = Object.fromEntries(Object.entries({
+    gclid, gbraid, wbraid, fbclid,
+    url: landing,
+    referrer: str(a.referrer, 300),
+    utmSource: str(a.utm_source), utmMedium: str(a.utm_medium), utmCampaign: str(a.utm_campaign),
+    utmTerm: str(a.utm_term), utmContent: str(a.utm_content),
+    medium: str(a.utm_medium) || (gclid || gbraid || wbraid ? "cpc" : ""),
+    campaign: str(a.utm_campaign),
+    sessionSource: gclid || gbraid || wbraid ? "Paid Search" : fbclid ? "Paid Social" : str(a.utm_source) ? "Other Campaigns" : "Direct traffic",
+  }).filter(([, v]) => v));
+
+  let c = await ghl(env, "/contacts/", { ...contactBody, attributionSource });
+  let contactId: string | undefined = c.data?.contact?.id;
+  if (!contactId && c.data?.meta?.contactId) {
+    // Already exists (matched on phone/email): update it; tags/attribution of the original visit are kept.
+    c = await ghl(env, "/contacts/upsert", contactBody);
+    contactId = c.data?.contact?.id || c.data?.meta?.contactId;
+  }
+  if (!contactId) {
+    console.error("GHL contact failed", c.status, JSON.stringify(c.data).slice(0, 500));
     return json({ ok: false, error: "We couldn't send your request. Please try again or message us on WhatsApp." }, 502);
   }
 

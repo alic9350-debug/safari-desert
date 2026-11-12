@@ -8,7 +8,7 @@
 | Tags | `new-enquiry` (re-added on every form submit — **use this as the workflow trigger**), website-lead, landing-page, google-ads, meta-ads, pkg-* (one per package), quoted, booked, tour-completed, paid, review-requested, reviewed, no-reply, lost-price, lost-date, lost-other, stop-automation, vip-guest, repeat-guest |
 | Custom values | `{{custom_values.safari__whatsapp_number}}`, `{{custom_values.safari__whatsapp_link}}`, `{{custom_values.safari__main_website}}`, `{{custom_values.safari__price_list}}`, `{{custom_values.safari__pickup_areas}}`, `{{custom_values.safari__what_to_bring}}`, `{{custom_values.safari__google_review_link}}` (**empty — fill it**), `{{custom_values.marketing__website_booking_page_url}}` |
 
-What the form does on each submit: upserts the contact (tags are only ever *added*), creates an opportunity in **New Lead** (or refreshes the contact's open one), adds a note with the full request, then re-adds `new-enquiry`.
+What the form does on each submit: **creates** new contacts with GHL's native attribution (gclid, gbraid, wbraid, UTMs, landing page → shows as *Paid Search*; this is what the **Add to Google Ads** action reads), or updates an existing contact (tags are only ever *added*), creates an opportunity in **New Lead** (or refreshes the contact's open one), adds a note with the full request, then re-adds `new-enquiry`.
 
 ## Do in the GHL screens (the API does not allow these for this sub-account)
 
@@ -97,3 +97,39 @@ Unpublish/delete **"3. Appt No Show"** (calendar-based, not used). Keep 5/6 as d
 3. After the tour → **Tour Completed**; when paid → **Paid** and set the opportunity value to the real amount, status **Won**.
 
 These stages and values are what we send back to Google Ads as "Qualified" and "Booked" conversions.
+
+---
+
+## Google Ads ← GHL (native "Add to Google Ads" action)
+Send qualified and booked leads back to Google Ads straight from GHL workflows.
+
+**1. Connect Google Ads:** Settings → Integrations → **Google** → Connect → sign in with the Google account that
+manages the Ads account → pick the **Google Ads customer account** (the 10-digit `XXX-XXX-XXXX` shown top-right in
+Google Ads; it is *not* the conversion ID 787388788).
+
+**2. Create two conversion actions** (Google Ads → Goals → Conversions → + New → **Import** → CRMs, files or other data
+sources → **Track conversions from clicks**; or in GHL Marketing → Ad Manager → Settings → Conversions):
+
+| Name (exact) | Category | Value | Goal |
+|---|---|---|---|
+| `Safari – Qualified Lead` | Qualified lead | none | Secondary |
+| `Safari – Booking Confirmed` | Converted lead | different values, default AED 75 | Secondary (Primary at ~30/month) |
+
+**3. Workflow "Google Ads | Qualified lead"**
+- Trigger: Pipeline Stage Changed → *Desert Safari Leads* → **Quoted on WhatsApp**; filter: Contact Tag **google-ads**.
+- Action: **Add to Google Ads** → conversion `Safari – Qualified Lead`.
+- Settings: Allow re-entry **OFF**.
+
+**4. Workflow "Google Ads | Booking confirmed"**
+- Trigger: Pipeline Stage Changed → **Booking Confirmed**; filter: Contact Tag **google-ads**.
+- Action: **Add to Google Ads** → conversion `Safari – Booking Confirmed`, value = the opportunity value
+  (`{{opportunity.monetary_value}}`), currency **AED**.
+- Settings: Allow re-entry **OFF**.
+- Team rule: set the opportunity value to the real booking amount **before** moving to Booking Confirmed.
+
+**5. Check:** Workflow → **Execution Logs**: "Executed" = sent. "Missing GCLID" = the contact did not come from a
+Google ad click (that is why the `google-ads` tag filter is there).
+
+`/api/conversions.csv` is an alternative feed for Google Ads scheduled HTTPS uploads. It stays **off** unless the
+Cloudflare secret `CONVERSIONS_PASSWORD` is set. Do not use it together with the workflows above (same conversion
+names would be counted twice).
