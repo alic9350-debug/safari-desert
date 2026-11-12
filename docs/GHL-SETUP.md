@@ -172,7 +172,8 @@ No GHL workflows needed. The feed reads the "Desert Safari Leads" pipeline live;
 
 1. Cloudflare → `safari-desert` → Settings → Variables and Secrets → add Secret **`CONVERSIONS_PASSWORD`** → redeploy.
 2. Google Ads → Goals → Conversions → Uploads / Data manager → **Schedules** → Source **HTTPS** →
-   URL `https://book.mavericksafariuae.com/api/conversions.csv`, username `googleads`, password as in step 1 → **Daily**.
+   two connections (one per action): `…/api/conversions.csv?action=qualified` → Safari – Qualified Lead, and
+   `…/api/conversions.csv?action=booked` → Safari – Booking Confirmed; username `googleads`, password as in step 1 → **Daily**.
 3. Conversion actions `Safari – Qualified Lead` and `Safari – Booking Confirmed` must exist (Import → clicks).
 4. Team: Quoted on WhatsApp → Qualified Lead; set real value, then Booking Confirmed → Booking Confirmed (value).
 Do not also run the "Add to Google Ads" or Sheet workflows (would double count).

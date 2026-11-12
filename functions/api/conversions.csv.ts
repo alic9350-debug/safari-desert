@@ -67,7 +67,9 @@ function authorized(request: Request, env: Env) {
 
 type Opp = { id: string; status: string; pipelineStageId: string; monetaryValue?: number; createdAt: string; contactId: string; contact?: { email?: string; phone?: string } };
 
-export async function buildCsv(env: Env, now = Date.now()) {
+export type Only = "qualified" | "booked" | undefined;
+
+export async function buildCsv(env: Env, now = Date.now(), only: Only = undefined) {
   const since = now - LOOKBACK_DAYS * 86400_000;
   const opps: Opp[] = [];
   for (let page = 1; page <= 5; page++) {
@@ -105,8 +107,8 @@ export async function buildCsv(env: Env, now = Date.now()) {
     if (!gclid && !emailHash && !phoneHash) continue;
 
     const created = Date.parse(o.createdAt);
-    rows.push([gclid, NAMES.qualified, dubaiTime(created + 60_000), "", "AED", emailHash, phoneHash]);
-    if (BOOKED.has(o.pipelineStageId) || o.status === "won") {
+    if (only !== "booked") rows.push([gclid, NAMES.qualified, dubaiTime(created + 60_000), "", "AED", emailHash, phoneHash]);
+    if (only !== "qualified" && (BOOKED.has(o.pipelineStageId) || o.status === "won")) {
       rows.push([gclid, NAMES.booked, dubaiTime(created + 120_000), String(o.monetaryValue || ""), "AED", emailHash, phoneHash]);
     }
   }
@@ -121,7 +123,11 @@ export async function onRequestGet({ request, env }: { request: Request; env: En
     return new Response("Unauthorized", { status: 401, headers: { "WWW-Authenticate": 'Basic realm="conversions"' } });
   }
   try {
-    const csv = await buildCsv(env);
+    // One Google Ads Data Manager connection = one conversion action, so each connection uses
+    // ?action=qualified or ?action=booked to get only its own rows.
+    const a = new URL(request.url).searchParams.get("action");
+    const only: Only = a === "qualified" || a === "booked" ? a : undefined;
+    const csv = await buildCsv(env, Date.now(), only);
     return new Response(csv, { headers: { "Content-Type": "text/csv; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" } });
   } catch (e) {
     console.error("conversions.csv failed", e);
