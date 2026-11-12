@@ -13,7 +13,7 @@ export const SITE = {
   adsId: "AW-787388788",
   adsLeadLabel: "zYBICJyuyLYdEPSyuvcC",
   // Secondary conversion "Safari LP – WhatsApp / Call Click". Paste its label here to switch it on.
-  adsClickLabel: "",
+  adsClickLabel: "CsOrCL7QkbcdEPSyuvcC",
 };
 
 export type Pkg = {
