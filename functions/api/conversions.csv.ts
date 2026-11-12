@@ -117,7 +117,9 @@ export async function buildCsv(env: Env, now = Date.now(), only: Only = undefine
   return ["Parameters:TimeZone=Asia/Dubai", header.join(","), ...rows.map((r) => r.map(csvCell).join(","))].join("\n") + "\n";
 }
 
-export async function onRequestGet({ request, env }: { request: Request; env: Env }): Promise<Response> {
+/** Shared handler. Data Manager needs the URL to END in ".csv" and ties one connection to one
+ *  conversion action, so qualified.csv and booked.csv call this with a fixed action. */
+export async function serveCsv(request: Request, env: Env, fixed?: Only): Promise<Response> {
   if (!env.CONVERSIONS_PASSWORD) return new Response("Not configured", { status: 503 });
   if (!authorized(request, env)) {
     return new Response("Unauthorized", { status: 401, headers: { "WWW-Authenticate": 'Basic realm="conversions"' } });
@@ -126,7 +128,7 @@ export async function onRequestGet({ request, env }: { request: Request; env: En
     // One Google Ads Data Manager connection = one conversion action, so each connection uses
     // ?action=qualified or ?action=booked to get only its own rows.
     const a = new URL(request.url).searchParams.get("action");
-    const only: Only = a === "qualified" || a === "booked" ? a : undefined;
+    const only: Only = fixed ?? (a === "qualified" || a === "booked" ? a : undefined);
     const csv = await buildCsv(env, Date.now(), only);
     return new Response(csv, { headers: { "Content-Type": "text/csv; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" } });
   } catch (e) {
@@ -134,3 +136,5 @@ export async function onRequestGet({ request, env }: { request: Request; env: En
     return new Response("Upstream error", { status: 502 });
   }
 }
+
+export const onRequestGet = ({ request, env }: { request: Request; env: Env }) => serveCsv(request, env);

@@ -64,8 +64,8 @@ Each row has the Google click ID (contact field `google_click_id`) plus SHA-256 
 (enhanced conversions for leads). Lost opportunities and anything older than 85 days are skipped. Times are
 stable (based on the opportunity creation time), so re-reading the file never double counts.
 Google Ads → Data manager → HTTPS → Conversions → offline. One connection per action: URL
-`https://book.mavericksafariuae.com/api/conversions.csv?action=qualified` (→ Safari – Qualified Lead) and
-`...?action=booked` (→ Safari – Booking Confirmed), username `googleads`, password as above, daily.
+`https://book.mavericksafariuae.com/api/qualified.csv` (→ Safari – Qualified Lead) and
+`https://book.mavericksafariuae.com/api/booked.csv` (→ Safari – Booking Confirmed), username `googleads`, password as above, daily.
 Up to 40 recent qualified opportunities per fetch (Workers free-plan request limit).
 After adding or changing `CONVERSIONS_PASSWORD`, push any commit (or retry the latest deployment) so it takes effect;
 `/api/conversions.csv` answers 503 until the secret is active and 401 without the right password.
