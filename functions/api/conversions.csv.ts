@@ -6,7 +6,7 @@
 // Rows carry the Google click ID when we have it, plus SHA-256 hashed email/phone
 // (Enhanced conversions for leads) so leads without a click ID can still match.
 // Conversion times are derived from the opportunity creation time so they stay stable
-// between fetches (Google de-duplicates identical click ID + name + time rows).
+// between fetches (Google de-duplicates identical click ID + name + time rows). Row 1 is the header (no Parameters line).
 
 interface Env {
   GHL_API_TOKEN: string;
@@ -40,9 +40,9 @@ async function sha256(s: string) {
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-/** "yyyy-MM-dd HH:mm:ss" in Dubai time (UTC+4, no DST). */
+/** "yyyy-MM-dd HH:mm:ss+0400" — Dubai time (UTC+4, no DST) with explicit offset, so no timezone header row is needed. */
 function dubaiTime(ms: number) {
-  return new Date(ms + 4 * 3600_000).toISOString().replace("T", " ").slice(0, 19);
+  return new Date(ms + 4 * 3600_000).toISOString().replace("T", " ").slice(0, 19) + "+0400";
 }
 
 const csvCell = (v: string | number) => {
@@ -114,7 +114,8 @@ export async function buildCsv(env: Env, now = Date.now(), only: Only = undefine
   }
 
   const header = ["Google Click ID", "Conversion Name", "Conversion Time", "Conversion Value", "Conversion Currency", "Email", "Phone Number"];
-  return ["Parameters:TimeZone=Asia/Dubai", header.join(","), ...rows.map((r) => r.map(csvCell).join(","))].join("\n") + "\n";
+  // Row 1 must be the header: Data Manager reads the first line as column names.
+  return [header.join(","), ...rows.map((r) => r.map(csvCell).join(","))].join("\n") + "\n";
 }
 
 /** Shared handler. Data Manager needs the URL to END in ".csv" and ties one connection to one
