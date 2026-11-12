@@ -167,13 +167,21 @@ pick the sheet / tab **Conversions** → map columns A–G → schedule **daily*
 
 ---
 
-## ✅ Chosen method: daily HTTPS feed (`/api/conversions.csv`)
-No GHL workflows needed. The feed reads the "Desert Safari Leads" pipeline live; Google Ads downloads it daily.
+## ✅ Chosen method: daily HTTPS feeds (live, set up 12 Nov 2026)
+No GHL workflows needed. Google Ads Data Manager downloads two password-protected CSV files daily; they are built
+live from the "Desert Safari Leads" pipeline.
 
-1. Cloudflare → `safari-desert` → Settings → Variables and Secrets → add Secret **`CONVERSIONS_PASSWORD`** → redeploy.
-2. Google Ads → Goals → Conversions → Uploads / Data manager → **Schedules** → Source **HTTPS** →
-   two connections (one per action): `…/api/qualified.csv` → Safari – Qualified Lead, and
-   `…/api/booked.csv` → Safari – Booking Confirmed; username `googleads`, password as in step 1 → **Daily**.
-3. Conversion actions `Safari – Qualified Lead` and `Safari – Booking Confirmed` must exist (Import → clicks).
-4. Team: Quoted on WhatsApp → Qualified Lead; set real value, then Booking Confirmed → Booking Confirmed (value).
-Do not also run the "Add to Google Ads" or Sheet workflows (would double count).
+| Data Manager connection | URL | Rows |
+|---|---|---|
+| Safari – Qualified Lead | `https://book.mavericksafariuae.com/api/qualified.csv` | opportunity in Quoted on WhatsApp or later (or Won) |
+| Safari – Booking Confirmed | `https://book.mavericksafariuae.com/api/booked.csv` | Booking Confirmed or later (or Won), value = opportunity value |
+
+- Auth: username `googleads`, password = Cloudflare secret `CONVERSIONS_PASSWORD` (changing it: update Cloudflare,
+  redeploy, then update both Data Manager connections).
+- Columns: Google Click ID, Conversion Name, Conversion Time (`yyyy-MM-dd HH:mm:ss+04:00`), Conversion Value,
+  Conversion Currency, Email (SHA-256), Phone Number (SHA-256, E.164), Transaction ID (`<opportunityId>-q|-b`).
+- Mapping in Data Manager: Conversion_Time → Conversion date/time, Transaction_ID → Transaction ID,
+  Google_Click_ID → GCLID, Email/Phone_Number → user identifiers, Conversion_Value/Currency → value (booked).
+- Lost/abandoned opportunities and anything older than 85 days are never sent.
+- Team rule: set the real booking value on the opportunity **before** moving it to Booking Confirmed.
+- Do not also run the "Add to Google Ads" or Google Sheet workflows (would double count).
