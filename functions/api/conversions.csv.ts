@@ -41,9 +41,9 @@ async function sha256(s: string) {
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-/** "yyyy-MM-dd HH:mm:ss+0400" — Dubai time (UTC+4, no DST) with explicit offset, so no timezone header row is needed. */
+/** "yyyy-MM-dd HH:mm:ss+04:00" — Dubai time (UTC+4, no DST) with explicit offset, so no timezone header row is needed. */
 function dubaiTime(ms: number) {
-  return new Date(ms + 4 * 3600_000).toISOString().replace("T", " ").slice(0, 19) + "+0400";
+  return new Date(ms + 4 * 3600_000).toISOString().replace("T", " ").slice(0, 19) + "+04:00";
 }
 
 const csvCell = (v: string | number) => {
