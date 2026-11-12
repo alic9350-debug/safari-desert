@@ -136,7 +136,7 @@ names would be counted twice).
 
 ---
 
-## Google Ads ← GHL via Google Sheet (chosen method)
+## Google Ads ← GHL via Google Sheet (alternative — NOT used)
 Sheet: **Maverick Safari – Google Ads Offline Conversions**
 https://docs.google.com/spreadsheets/d/10IwUrDWdjGcQ2tFIxPbxyyynsXKGt0CnafA2pH3VrJ0/edit
 (owned by your Google account · tab **Conversions** · timezone Asia/Dubai · columns A–G formatted as text; row 1 = headers;
@@ -164,3 +164,15 @@ Same as above with trigger stage **Booking Confirmed**, Conversion Name `Safari 
 ### Google Ads side
 Goals → Conversions → Data manager → connect **Google Sheets** (sign in with the sheet owner's Google account) →
 pick the sheet / tab **Conversions** → map columns A–G → schedule **daily**.
+
+---
+
+## ✅ Chosen method: daily HTTPS feed (`/api/conversions.csv`)
+No GHL workflows needed. The feed reads the "Desert Safari Leads" pipeline live; Google Ads downloads it daily.
+
+1. Cloudflare → `safari-desert` → Settings → Variables and Secrets → add Secret **`CONVERSIONS_PASSWORD`** → redeploy.
+2. Google Ads → Goals → Conversions → Uploads / Data manager → **Schedules** → Source **HTTPS** →
+   URL `https://book.mavericksafariuae.com/api/conversions.csv`, username `googleads`, password as in step 1 → **Daily**.
+3. Conversion actions `Safari – Qualified Lead` and `Safari – Booking Confirmed` must exist (Import → clicks).
+4. Team: Quoted on WhatsApp → Qualified Lead; set real value, then Booking Confirmed → Booking Confirmed (value).
+Do not also run the "Add to Google Ads" or Sheet workflows (would double count).
