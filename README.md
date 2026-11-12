@@ -66,6 +66,8 @@ stable (based on the opportunity creation time), so re-reading the file never do
 Google Ads → Goals → Conversions → Uploads → Schedules → Source **HTTPS** → URL
 `https://book.mavericksafariuae.com/api/conversions.csv`, username `googleads`, password as above, daily.
 Up to 40 recent qualified opportunities per fetch (Workers free-plan request limit).
+After adding or changing `CONVERSIONS_PASSWORD`, push any commit (or retry the latest deployment) so it takes effect;
+`/api/conversions.csv` answers 503 until the secret is active and 401 without the right password.
 
 ## Google Ads final URLs (message match)
 Add `?pkg=<id>` to an ad group's final URL: the headline changes to match and the package is preselected.
