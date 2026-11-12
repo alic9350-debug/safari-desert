@@ -143,7 +143,17 @@ export async function serveCsv(request: Request, env: Env, fixed?: Only): Promis
     const a = new URL(request.url).searchParams.get("action");
     const only: Only = fixed ?? (a === "qualified" || a === "booked" ? a : undefined);
     const csv = await buildCsv(env, Date.now(), only);
-    return new Response(csv, { headers: { "Content-Type": "text/csv; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" } });
+    const file = only ?? "conversions";
+    const headers = {
+      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Disposition": `attachment; filename="${file}.csv"`,
+      "Content-Length": String(new TextEncoder().encode(csv).length),
+      "Last-Modified": new Date().toUTCString(),
+      "Cache-Control": "no-store",
+      "X-Robots-Tag": "noindex",
+    };
+    // HEAD (used by fetchers to check size/type first) gets the same headers without a body.
+    return new Response(request.method === "HEAD" ? null : csv, { headers });
   } catch (e) {
     console.error("conversions.csv failed", e);
     return new Response("Upstream error", { status: 502 });
@@ -151,3 +161,4 @@ export async function serveCsv(request: Request, env: Env, fixed?: Only): Promis
 }
 
 export const onRequestGet = ({ request, env }: { request: Request; env: Env }) => serveCsv(request, env);
+export const onRequestHead = onRequestGet;
