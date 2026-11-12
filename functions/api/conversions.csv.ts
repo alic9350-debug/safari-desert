@@ -107,13 +107,14 @@ export async function buildCsv(env: Env, now = Date.now(), only: Only = undefine
     if (!gclid && !emailHash && !phoneHash) continue;
 
     const created = Date.parse(o.createdAt);
-    if (only !== "booked") rows.push([gclid, NAMES.qualified, dubaiTime(created + 60_000), "", "AED", emailHash, phoneHash]);
+    // Transaction ID = opportunity id + action suffix: unique and stable, so Google de-duplicates refetches.
+    if (only !== "booked") rows.push([gclid, NAMES.qualified, dubaiTime(created + 60_000), "", "AED", emailHash, phoneHash, `${o.id}-q`]);
     if (only !== "qualified" && (BOOKED.has(o.pipelineStageId) || o.status === "won")) {
-      rows.push([gclid, NAMES.booked, dubaiTime(created + 120_000), String(o.monetaryValue || ""), "AED", emailHash, phoneHash]);
+      rows.push([gclid, NAMES.booked, dubaiTime(created + 120_000), String(o.monetaryValue || ""), "AED", emailHash, phoneHash, `${o.id}-b`]);
     }
   }
 
-  const header = ["Google Click ID", "Conversion Name", "Conversion Time", "Conversion Value", "Conversion Currency", "Email", "Phone Number"];
+  const header = ["Google Click ID", "Conversion Name", "Conversion Time", "Conversion Value", "Conversion Currency", "Email", "Phone Number", "Transaction ID"];
   // Row 1 must be the header: Data Manager reads the first line as column names.
   return [header.join(","), ...rows.map((r) => r.map(csvCell).join(","))].join("\n") + "\n";
 }
