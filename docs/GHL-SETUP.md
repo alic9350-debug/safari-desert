@@ -139,7 +139,7 @@ names would be counted twice).
 ## Google Ads ← GHL via Google Sheet (chosen method)
 Sheet: **Maverick Safari – Google Ads Offline Conversions**
 https://docs.google.com/spreadsheets/d/10IwUrDWdjGcQ2tFIxPbxyyynsXKGt0CnafA2pH3VrJ0/edit
-(owner rafiq…@gmail.com · tab **Conversions** · timezone Asia/Dubai · columns A–G formatted as text; row 1 = headers;
+(owned by your Google account · tab **Conversions** · timezone Asia/Dubai · columns A–G formatted as text; row 1 = headers;
 tab "How it works" explains each column). Do not rename the tab or edit row 1.
 
 ### Workflow "Google Ads | Qualified → Sheet"
