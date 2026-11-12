@@ -52,9 +52,20 @@ Events pushed to the dataLayer:
 | `form_start`, `form_step`, `select_package` | Funnel steps | GA4 events |
 
 ## Offline conversions (qualified / booked → Google Ads)
-GHL stores the click ID in the custom field `google_click_id` (plus `gbraid`/`wbraid`).
-When an opportunity moves to **Hot Lead** / **New Booking** / **Sale**, a GHL workflow sends
-the click ID, conversion name, time and value to Google Ads (via a Google Sheet scheduled upload, or the Google Ads API).
+`GET /api/conversions.csv` (Basic auth: user `googleads`, password = Cloudflare secret `CONVERSIONS_PASSWORD`)
+returns a Google Ads click-conversion upload file built live from the GHL pipeline "Desert Safari Leads":
+
+| Conversion name | Row added when the opportunity is… | Value |
+|---|---|---|
+| `Safari – Qualified Lead` | in **Quoted on WhatsApp** or any later stage (or Won) | – |
+| `Safari – Booking Confirmed` | in **Booking Confirmed**, Tour Completed, Paid, Left a Review (or Won) | opportunity value (AED) |
+
+Each row has the Google click ID (contact field `google_click_id`) plus SHA-256 hashed email and phone
+(enhanced conversions for leads). Lost opportunities and anything older than 85 days are skipped. Times are
+stable (based on the opportunity creation time), so re-reading the file never double counts.
+Google Ads → Goals → Conversions → Uploads → Schedules → Source **HTTPS** → URL
+`https://book.mavericksafariuae.com/api/conversions.csv`, username `googleads`, password as above, daily.
+Up to 40 recent qualified opportunities per fetch (Workers free-plan request limit).
 
 ## Google Ads final URLs (message match)
 Add `?pkg=<id>` to an ad group's final URL: the headline changes to match and the package is preselected.

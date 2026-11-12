@@ -12,6 +12,8 @@ export const SITE = {
   // Google Ads: conversion action "Safari LP – Lead Form" (fired on the thank-you page)
   adsId: "AW-787388788",
   adsLeadLabel: "zYBICJyuyLYdEPSyuvcC",
+  // Secondary conversion "Safari LP – WhatsApp / Call Click". Paste its label here to switch it on.
+  adsClickLabel: "",
 };
 
 export type Pkg = {
