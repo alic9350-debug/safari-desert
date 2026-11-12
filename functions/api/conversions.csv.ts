@@ -31,7 +31,8 @@ const BOOKED = new Set([STAGE.booked, STAGE.tour, STAGE.paid, STAGE.review]);
 
 export const NAMES = { qualified: "Safari – Qualified Lead", booked: "Safari – Booking Confirmed" };
 const LOOKBACK_DAYS = 85; // Google accepts click conversions up to 90 days after the click
-const MAX_CONTACT_LOOKUPS = 40; // Workers free plan: 50 outbound requests per invocation
+const MAX_CONTACT_LOOKUPS = 40;
+const SAMPLE_UNTIL = 1794511426000; // setup window for the example row (see buildCsv) // Workers free plan: 50 outbound requests per invocation
 
 const hdrs = (env: Env) => ({ Authorization: `Bearer ${env.GHL_API_TOKEN}`, Version: "2021-07-28", Accept: "application/json" });
 
@@ -112,6 +113,16 @@ export async function buildCsv(env: Env, now = Date.now(), only: Only = undefine
     if (only !== "qualified" && (BOOKED.has(o.pipelineStageId) || o.status === "won")) {
       rows.push([gclid, NAMES.booked, dubaiTime(created + 120_000), String(o.monetaryValue || ""), "AED", emailHash, phoneHash, `${o.id}-b`]);
     }
+  }
+
+  // Google Data Manager detects columns from data rows. During initial setup (until 1794511426000 ms)
+  // an empty feed gets ONE obviously fake example row; Google rejects it on import (invalid click ID),
+  // so no conversion is ever recorded from it. After the cutoff it is never emitted.
+  if (rows.length === 0 && now < SAMPLE_UNTIL) {
+    const name = only === "booked" ? NAMES.booked : NAMES.qualified;
+    // Hashes of an address/number that cannot exist (".invalid" TLD), so they can never match a person.
+    rows.push(["SAMPLE_SETUP_ROW_NOT_A_REAL_CLICK", name, dubaiTime(now - 3600_000), only === "booked" ? "1" : "", "AED",
+      await sha256("setup-sample@example.invalid"), await sha256("+10000000000"), "setup-sample"]);
   }
 
   const header = ["Google Click ID", "Conversion Name", "Conversion Time", "Conversion Value", "Conversion Currency", "Email", "Phone Number", "Transaction ID"];
