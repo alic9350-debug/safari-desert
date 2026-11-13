@@ -96,7 +96,9 @@ export async function buildCsv(env: Env, now = Date.now(), only: Only = undefine
     let phone = o.contact?.phone || "";
     const cr = await fetch(`${GHL}/contacts/${o.contactId}`, { headers: hdrs(env) });
     if (cr.ok) {
-      const c = ((await cr.json()) as { contact?: { email?: string; phone?: string; customFields?: { id: string; value: unknown }[] } }).contact;
+      const c = ((await cr.json()) as { contact?: { email?: string; phone?: string; tags?: string[]; customFields?: { id: string; value: unknown }[] } }).contact;
+      // Contacts tagged "test" are never sent to Google Ads (safe testing of workflows/stages).
+      if (c?.tags?.some((t) => t.toLowerCase() === "test")) continue;
       gclid = String(c?.customFields?.find((f) => f.id === GCLID_FIELD)?.value || "");
       email = c?.email || email;
       phone = c?.phone || phone;

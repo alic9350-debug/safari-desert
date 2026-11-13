@@ -182,6 +182,7 @@ live from the "Desert Safari Leads" pipeline.
   Conversion Currency, Email (SHA-256), Phone Number (SHA-256, E.164), Transaction ID (`<opportunityId>-q|-b`).
 - Mapping in Data Manager: Conversion_Time → Conversion date/time, Transaction_ID → Transaction ID,
   Google_Click_ID → GCLID, Email/Phone_Number → user identifiers, Conversion_Value/Currency → value (booked).
-- Lost/abandoned opportunities and anything older than 85 days are never sent.
+- Lost/abandoned opportunities, contacts tagged `test`, and anything older than 85 days are never sent.
+- Empty days: one keep-alive row (no click ID, hashes of a `.invalid` address) so runs don't fail with error 4000; it can never match a user.
 - Team rule: set the real booking value on the opportunity **before** moving it to Booking Confirmed.
 - Do not also run the "Add to Google Ads" or Google Sheet workflows (would double count).
