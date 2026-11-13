@@ -183,6 +183,7 @@ live from the "Desert Safari Leads" pipeline.
 - Mapping in Data Manager: Conversion_Time → Conversion date/time, Transaction_ID → Transaction ID,
   Google_Click_ID → GCLID, Email/Phone_Number → user identifiers, Conversion_Value/Currency → value (booked).
 - Lost/abandoned opportunities, contacts tagged `test`, and anything older than 85 days are never sent.
-- Empty days: one keep-alive row (no click ID, hashes of a `.invalid` address) so runs don't fail with error 4000; it can never match a user.
+- Every file ends with one fully-populated schema row (fake click ID, hashes of a `.invalid` address, value 0) so
+  Data Manager can infer every column type (otherwise error 4000). Google rejects it: expect "1 row with errors" per run.
 - Team rule: set the real booking value on the opportunity **before** moving it to Booking Confirmed.
 - Do not also run the "Add to Google Ads" or Google Sheet workflows (would double count).

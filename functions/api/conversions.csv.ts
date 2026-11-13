@@ -116,15 +116,16 @@ export async function buildCsv(env: Env, now = Date.now(), only: Only = undefine
     }
   }
 
-  // Data Manager fails a run when the file has no data rows (error 4000), so an empty feed
-  // gets ONE keep-alive row: no click ID, and email/phone hashes of an address/number that cannot
-  // exist (".invalid" TLD), so it can never match a Google user and never records a conversion.
-  // Its Transaction ID changes daily so it is not reported as a duplicate.
-  if (rows.length === 0) {
+  // Data Manager infers each mapped column's type from its values and fails the run (error 4000)
+  // if a column has no non-empty value (e.g. no rows, or no row with a click ID / email / value).
+  // So EVERY file ends with one fully-populated schema row: a fake click ID (Google rejects the row as
+  // invalid, so it is never recorded), hashes of an address/number that cannot exist (".invalid"),
+  // value 0, and a daily Transaction ID. Expect "1 row with errors" per run; that is this row.
+  {
     const name = only === "booked" ? NAMES.booked : NAMES.qualified;
     const day = dubaiTime(now).slice(0, 10).replace(/-/g, "");
-    rows.push(["", name, dubaiTime(now - 3600_000), only === "booked" ? "0" : "", "AED",
-      await sha256("no-real-leads-yet@example.invalid"), await sha256("+10000000000"), `keepalive-${day}${only ? "-" + only[0] : ""}`]);
+    rows.push(["SCHEMA_ROW_NOT_A_REAL_CLICK", name, dubaiTime(now - 3600_000), "0", "AED",
+      await sha256("schema-row@example.invalid"), await sha256("+10000000000"), `schema-${day}${only ? "-" + only[0] : ""}`]);
   }
 
   const header = ["Google Click ID", "Conversion Name", "Conversion Time", "Conversion Value", "Conversion Currency", "Email", "Phone Number", "Transaction ID"];
