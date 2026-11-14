@@ -5,8 +5,9 @@ import { asset } from "@/lib/asset";
 export const SITE = {
   brand: "Maverick Safari UAE",
   mainSite: "https://mavericksafariuae.com",
-  whatsapp: "971552525075", // digits only, used for wa.me links
-  whatsappDisplay: "+971 55 252 5075",
+  whatsapp: "971566145501", // digits only, used for wa.me links (number connected to GHL WhatsApp)
+  whatsappDisplay: "+971 56 614 5501",
+  phone: "971552525075", // digits only, used for tel: links (calls)
   gtmId: process.env.NEXT_PUBLIC_GTM_ID || "GTM-TWKWS8T5",
   currency: "AED",
   // Google Ads: conversion action "Safari LP – Lead Form" (fired on the thank-you page)

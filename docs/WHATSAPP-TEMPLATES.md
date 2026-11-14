@@ -16,6 +16,8 @@ Rules: no variable at the very start/end of a body; links in buttons; Utility = 
 | 9 | safari_budget_option | Marketing | 1 name | QR: Book Bus Safari · Book Self-Drive | WF6 lost-price |
 | 10 | safari_friends_visiting | Marketing | 1 name | QR: Yes, friends are visiting · Not right now | WF7 +45 days |
 
+Connected WhatsApp number (GHL): +971 56 614 5501. Calls: +971 55 252 5075.
+
 Variable mapping in GHL: first name `{{contact.first_name}}`, tour type `{{contact.tour_type}}`, date
 `{{contact.tour_date}}`, pickup time `{{contact.pickup_time}}`, pickup location `{{contact.pickup_location}}`.
 Full body texts were delivered in chat on 14 Nov 2026; quick-reply taps open the 24-hour free-form window.

@@ -247,7 +247,7 @@ export default function Home() {
           <img src={asset("/img/logo-320.webp")} alt={SITE.brand} width={140} height={40} className="foot-logo" loading="lazy" />
           <div>
             <p><strong>{SITE.brand}</strong> · Desert safaris &amp; UAE tours · Dubai, United Arab Emirates</p>
-            <p><Icon name="chat" size={14} /> WhatsApp: <a data-loc="footer" href={waLink(WA_TEXT, SITE.whatsapp)} target="_blank" rel="noopener">{SITE.whatsappDisplay}</a> · <a data-loc="footer" href={`tel:+${SITE.whatsapp}`}>Call us</a> · <a href={`${SITE.mainSite}/contact/`}>Contact</a> · <a href={`${SITE.mainSite}/privacy-policy/`}>Privacy policy</a> · <a href={SITE.mainSite}>Main website</a></p>
+            <p><Icon name="chat" size={14} /> WhatsApp: <a data-loc="footer" href={waLink(WA_TEXT, SITE.whatsapp)} target="_blank" rel="noopener">{SITE.whatsappDisplay}</a> · <a data-loc="footer" href={`tel:+${SITE.phone}`}>Call us</a> · <a href={`${SITE.mainSite}/contact/`}>Contact</a> · <a href={`${SITE.mainSite}/privacy-policy/`}>Privacy policy</a> · <a href={SITE.mainSite}>Main website</a></p>
             <p className="copy">© {new Date().getFullYear()} {SITE.brand}. All rights reserved.</p>
           </div>
         </div>
