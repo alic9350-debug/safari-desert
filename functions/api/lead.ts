@@ -172,14 +172,6 @@ export async function onRequestPost({ request, env }: Ctx): Promise<Response> {
     return json({ ok: false, error: "We couldn't send your request. Please try again or message us on WhatsApp." }, 502);
   }
 
-  // 1b) Re-add the "new-enquiry" tag on EVERY submission, so the GHL workflow trigger
-  //     "Contact Tag added: new-enquiry" fires for repeat customers too (the location
-  //     doesn't allow duplicate opportunities, so "Opportunity created" would not).
-  // Tags are ADDED (never sent in the upsert, which would replace existing tags like "booked").
-  await ghl(env, `/contacts/${contactId}/tags`, { tags: ["new-enquiry"] }, "DELETE");
-  const t = await ghl(env, `/contacts/${contactId}/tags`, { tags: [...tags, "new-enquiry"] });
-  if (!t.ok) console.error("GHL tag failed", t.status, JSON.stringify(t.data).slice(0, 300));
-
   // 2) Opportunity in the pipeline (non-fatal if it already exists)
   const oppName = `${name} – ${pkg.name} – ${date}`;
   let o = await ghl(env, "/opportunities/", {
@@ -206,6 +198,16 @@ export async function onRequestPost({ request, env }: Ctx): Promise<Response> {
     }
   }
   if (!o.ok) console.error("GHL opportunity failed", o.status, JSON.stringify(o.data).slice(0, 500));
+
+  // 2b) Re-add the "new-enquiry" tag AFTER the opportunity exists, so the GHL workflow it triggers
+  //     (which looks up the opportunity first) always finds it.
+  //     Re-add on EVERY submission, so the GHL workflow trigger
+  //     "Contact Tag added: new-enquiry" fires for repeat customers too (the location
+  //     doesn't allow duplicate opportunities, so "Opportunity created" would not).
+  // Tags are ADDED (never sent in the upsert, which would replace existing tags like "booked").
+  await ghl(env, `/contacts/${contactId}/tags`, { tags: ["new-enquiry"] }, "DELETE");
+  const t = await ghl(env, `/contacts/${contactId}/tags`, { tags: [...tags, "new-enquiry"] });
+  if (!t.ok) console.error("GHL tag failed", t.status, JSON.stringify(t.data).slice(0, 300));
 
   // 3) Note with the full request, for the team
   const note = [
