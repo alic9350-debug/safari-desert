@@ -80,7 +80,7 @@ export default function Home() {
         <section className="sec" id="packages">
           <div className="wrap">
             <div className="sec-head">
-              <p className="kicker">Packages &amp; prices</p>
+              <p className="kicker">Desert Safari Dubai packages &amp; prices</p>
               <h2>Choose your desert adventure</h2>
               <p>Transparent prices. What you see is what you pay.</p>
             </div>

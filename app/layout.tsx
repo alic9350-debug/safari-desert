@@ -6,8 +6,8 @@ import "@fontsource-variable/plus-jakarta-sans";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Dubai Desert Safari from AED 75 | Maverick Safari UAE",
-  description: "Book a Dubai desert safari direct with the operator: hotel pickup, 4x4 dune bashing, camel ride, BBQ dinner & live shows. No hidden fees. Fast WhatsApp confirmation.",
+  title: "Desert Safari Dubai from AED 75 | Maverick Safari UAE",
+  description: "Desert Safari Dubai: book direct with the operator: hotel pickup, 4x4 dune bashing, camel ride, BBQ dinner & live shows. No hidden fees. Fast WhatsApp confirmation.",
   // Ad landing page: keep it out of organic search so it doesn't compete with the main site.
   robots: { index: false, follow: true },
   icons: { icon: asset("/favicon.webp") },
